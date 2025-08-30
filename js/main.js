@@ -32,9 +32,18 @@ try {
             loginMessage.textContent = "Please enter an email.";
             return;
         }
+
+        const recaptchaToken = grecaptcha.getResponse();
+        if (!recaptchaToken) {
+            loginMessage.textContent = "Please complete the reCAPTCHA.";
+            return;
+        }
+
         loginMessage.textContent = "Requesting code...";
         requestLoginCodeBtn.disabled = true;
-        const result = await requestLoginCode(email);
+        
+        const result = await requestLoginCode(email, recaptchaToken);
+        
         loginMessage.textContent = result.message;
         
         if (result.success) {
@@ -43,6 +52,7 @@ try {
             requestLoginCodeBtn.style.display = 'none';
         } else {
              requestLoginCodeBtn.disabled = false;
+             grecaptcha.reset();
         }
     }
 
@@ -71,10 +81,11 @@ try {
         } else {
             loginMessage.textContent = `Login failed: ${result.message}`;
             loginBtn.disabled = false;
+            grecaptcha.reset();
         }
     }
     
-    // --- GAME LOGIC (Se inicializa después del login) ---
+    // --- GAME LOGIC ---
     let canvas, ctx, players, enemies, platforms, particles, explosiveBlock, keys;
     let level, highScore, musicStarted, playerSelectOption, levelTransitionTimer;
 
@@ -121,7 +132,6 @@ try {
         resizeGame();
         window.addEventListener('resize', resizeGame);
         
-        // El estado inicial del juego será la selección de jugador (dentro del canvas)
         gameState = 'playerSelect'; 
         
         gameLoop();
@@ -135,6 +145,7 @@ try {
     }
     
     function resizeGame() {
+        if (!canvas) return;
         canvas.width = GAME_WIDTH;
         canvas.height = GAME_HEIGHT;
         const container = document.getElementById('game-canvas-container');
@@ -207,7 +218,7 @@ try {
         players.push(new Player(1, p1Controls, '🤖', playerData));
         if (numPlayers === 2) { 
             const p2Controls = { left: 'arrowleft', right: 'arrowright', jump: 'arrowup' }; 
-            const p2Data = { Username: "Player 2", HP_Max: 1000, Attack: 1, Defense: 1, score: 0 };
+            const p2Data = { Username: "Player 2", HP_Max: 1000, Attack: 1, Defense: 1, DraicorCoins: 0 };
             players.push(new Player(2, p2Controls, '🧑‍🚀', p2Data)); 
         }
         explosiveBlock = new ExplosiveBlock(); 
@@ -243,8 +254,8 @@ try {
 
     function update() {
         if (gameState === 'playing') {
-            players.forEach(p => p.update(keys, particles, Particle)); 
-            enemies.forEach(e => e.update(platforms, particles, Particle, enemies)); 
+            players.forEach(p => p.update(keys)); 
+            enemies.forEach(e => e.update(platforms)); 
             platforms.forEach(p => p.update()); 
             if (explosiveBlock) explosiveBlock.update(); 
             handleCollisions();
@@ -285,7 +296,7 @@ try {
                         for (let i = 0; i < 20; i++) particles.push(new Particle(enemy.x, enemy.y, enemy.sprite)); 
                         player.addScore(200, updateHighScore); 
                     } else { 
-                        player.die(enemy.damage, particles, Particle, checkGameOver, soundLoseLife); 
+                        player.die(enemy.damage, particles, Particle, checkGameOver, playSound, soundLoseLife); 
                     } 
                 } 
             });
@@ -324,7 +335,7 @@ try {
             const p1 = players[0];
             ctx.textAlign = 'left';
             ctx.fillStyle = '#ff4136';
-            ctx.fillText('P1 SCORE', 40, 30);
+            ctx.fillText(p1.username, 40, 30);
             ctx.fillStyle = 'white';
             ctx.fillText((p1.score || 0).toString().padStart(6, '0'), 40, 60);
             ctx.fillStyle = '#ff4136';
@@ -340,11 +351,9 @@ try {
         }
         ctx.textAlign = 'center';
         ctx.fillStyle = '#ff4136';
-        ctx.fillText('DraicorCoins', GAME_WIDTH / 2, 30);
+        ctx.fillText('HI-SCORE', GAME_WIDTH / 2, 30);
         ctx.fillStyle = 'white';
-        const totalScore = players.reduce((sum, p) => sum + (p.score || 0), 0);
-        const formattedScore = '🪙 ' + totalScore.toLocaleString('en-US');
-        ctx.fillText(formattedScore, GAME_WIDTH / 2, 60);
+        ctx.fillText(highScore.toString().padStart(6, '0'), GAME_WIDTH / 2, 60);
 
         if (players.length > 1 && players[1]) {
             const p2 = players[1];
