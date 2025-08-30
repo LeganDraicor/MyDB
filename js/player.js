@@ -1,45 +1,46 @@
-import { Particle } from './particle.js';
+import { playSound } from './main.js'; // Importaremos playSound si la movemos a main
+
+const GRAVITY = 0.6;
+const PLAYER_JUMP = -10;
+const JUMP_HOLD_GRAVITY = GRAVITY * 0.5;
+const PLAYER_SPEED = 5;
+const GAME_WIDTH = 960;
+
+// Necesitaremos una referencia al sonido de salto
+let soundJump; 
+export function setPlayerDependencies(jumpSound) {
+    soundJump = jumpSound;
+}
 
 export class Player {
-    constructor(id, controls, sprite) {
+    constructor(id, controls, sprite, playerData) {
         this.id = id;
         this.width = 40;
         this.height = 40;
-        this.sprite = sprite;
         this.controls = controls;
+        this.sprite = sprite;
+        
+        // Datos del servidor
+        this.username = playerData.Username;
+        this.maxHp = playerData.HP_Max || 1000;
+        this.hp = this.maxHp;
+        this.attack = playerData.Attack || 1;
+        this.defense = playerData.Defense || 1;
 
+        this.x = 0;
+        this.y = 0;
         this.vx = 0;
         this.vy = 0;
         this.onGround = false;
         this.onFrozenPlatform = false;
         this.isDead = false;
-        
-        // Estos valores se inicializarán con datos del servidor
         this.score = 0;
-        this.draicorCoins = 0;
-        this.hp = 100;
-        this.maxHp = 100;
-        this.attack = 1;
-        this.defense = 1;
-        this.username = "Player";
-
-        this.x = 0;
-        this.y = 0;
+        
+        this.resetPosition();
     }
-
-    // ¡NUEVO! Método para poblar al jugador con datos del backend
-    initializeWithData(playerData) {
-        this.score = playerData.GameplayScore || 0;
-        this.draicorCoins = playerData.DraicorCoins || 0;
-        this.maxHp = playerData.HP_Max || 100;
-        this.hp = this.maxHp; // Empieza con la vida al máximo
-        this.attack = playerData.Attack || 1;
-        this.defense = playerData.Defense || 1;
-        this.username = playerData.Username || "Player";
-    }
-
-    resetPosition(GAME_WIDTH, GAME_HEIGHT) {
-        this.x = GAME_WIDTH / 2 - this.width / 2;
+    
+    resetPosition() {
+        this.x = GAME_WIDTH / 2 - this.width / 2 + (this.id === 1 ? -50 : 50);
         this.y = GAME_HEIGHT - this.height - 50;
         this.vx = 0;
         this.vy = 0;
@@ -48,7 +49,7 @@ export class Player {
             this.isDead = false;
         }
     }
-
+    
     draw(ctx) {
         if (this.isDead) return;
         ctx.font = '40px sans-serif';
@@ -56,12 +57,12 @@ export class Player {
         ctx.textBaseline = 'middle';
         ctx.fillText(this.sprite, this.x + this.width / 2, this.y + this.height / 2);
     }
-
-    update(keys, GAME_WIDTH, PLAYER_SPEED, GRAVITY, JUMP_HOLD_GRAVITY, playSound, soundJump) {
+    
+    update(keys, particles, Particle) { // Pasamos dependencias
         if (this.isDead) return;
 
         if (keys[this.controls.jump] && this.onGround) {
-            this.jump(playSound, soundJump);
+            this.jump();
         }
 
         if (this.onFrozenPlatform) {
@@ -77,10 +78,11 @@ export class Player {
             if (keys[this.controls.left]) this.vx = -PLAYER_SPEED;
             if (keys[this.controls.right]) this.vx = PLAYER_SPEED;
         }
+        
         this.x += this.vx;
         if (this.x < -this.width) this.x = GAME_WIDTH;
         if (this.x > GAME_WIDTH) this.x = -this.width;
-
+        
         if (this.vy < 0 && keys[this.controls.jump]) {
             this.vy += JUMP_HOLD_GRAVITY;
         } else {
@@ -91,22 +93,19 @@ export class Player {
         this.onGround = false;
         this.onFrozenPlatform = false;
     }
-
-    jump(playSound, soundJump) {
-        const PLAYER_JUMP = -10;
+    
+    jump() {
         if (this.onGround && !this.isDead) {
             this.vy = PLAYER_JUMP;
-            playSound(soundJump);
+            // playSound(soundJump); // La lógica de sonido se manejará en main.js
         }
     }
-
-    die(damageAmount, particles, checkGameOver, playSound, soundLoseLife) {
+    
+    die(damageAmount, particles, Particle, checkGameOver, soundLoseLife) {
         if (this.isDead) return;
-
-        // Simple cálculo de daño con defensa
-        const damageTaken = Math.max(1, damageAmount - this.defense);
-        this.hp -= damageTaken;
-        playSound(soundLoseLife);
+        
+        this.hp -= damageAmount;
+        // playSound(soundLoseLife);
 
         if (this.hp <= 0) {
             this.hp = 0;
@@ -117,10 +116,10 @@ export class Player {
             checkGameOver();
         }
     }
-
-    addScore(points) {
+    
+    addScore(points, updateHighScore) {
         this.score += points;
-        // La puntuación ahora se guarda en el servidor al final del juego
+        updateHighScore(this.score);
     }
 }
 
