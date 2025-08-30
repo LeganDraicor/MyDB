@@ -1,7 +1,7 @@
 import { requestLoginCode, loginWithCode } from './api.js';
 
 try {
-    console.log("LOGIN TEST SCRIPT LOADED");
+    console.log("LOGIN TEST SCRIPT V2 LOADED");
 
     // Elementos del DOM
     const messageOverlay = document.getElementById('message-overlay');
@@ -34,8 +34,6 @@ try {
     }
 
     async function handleLogin() {
-        // En esta prueba, el login no iniciará el juego.
-        // Solo mostrará un mensaje de éxito o error.
         const email = emailInput.value;
         const code = codeInput.value;
         if (!code) {
