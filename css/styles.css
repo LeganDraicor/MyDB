@@ -1,93 +1,93 @@
-/* General Styles */
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #000; font-family: 'Press Start 2P', cursive; text-align: center; }
-body.logged-out { display: flex; justify-content: center; align-items: center; }
-.container { border: 4px solid #fff; padding: 20px; background-color: #1a1a1a; box-shadow: 0 0 20px #fff; border-radius: 10px; max-width: 90%; width: 500px; color: #FFFFFF; }
-h1 { color: #f8b800; text-shadow: 2px 2px #e84800; }
-h2 { text-shadow: 2px 2px #ff8c00; }
-h3 { font-size: 0.9em; color: #f8b800; margin-top: 20px; margin-bottom: 10px; border-bottom: 1px dashed #fff; padding-bottom: 5px;}
-button { font-family: 'Press Start 2P', cursive; background-color: #555; color: #fff; border: 2px solid #fff; padding: 10px 20px; cursor: pointer; text-transform: uppercase; margin: 5px; border-radius: 5px; transition: background-color 0.3s, box-shadow 0.3s; display: inline-flex; justify-content: center; align-items: center; white-space: nowrap; }
-button:hover { background-color: #777; box-shadow: 0 0 10px #fff; }
-button:disabled { background-color: #333; color: #888; cursor: not-allowed; box-shadow: none; border-color: #888; }
-input, select { font-family: 'Press Start 2P', cursive; padding: 10px; border: 2px solid #fff; background-color: #333; color: #fff; text-align: center; border-radius: 5px; margin-bottom: 10px; width: calc(100% - 24px); }
-a { color: #00ffff; text-decoration: none; }
-a:hover { text-decoration: underline; }
-.hidden { display: none !important; }
-#message, #code-message, #wallet-message { margin-top: 15px; color: #ffcc00; min-height: 20px; font-size: 0.8em; }
-.login-container { border-color: #f8b800; box-shadow: 0 0 20px #f8b800; }
-.login-container input { border-color: #f8b800; }
-.login-container button { background-color: #e84800; border-color: #fff; }
-.login-container button:hover { background-color: #c83800; box-shadow: 0 0 10px #fff;}
-.login-container p { font-size: 0.7em; line-height: 1.5; }
-.login-container small { font-size: 0.5em; color: #aaa; }
-.recaptcha-container { text-align: center; margin: 15px 0; }
-.g-recaptcha { display: inline-block; }
-#game-screen .stats { display: flex; justify-content: space-around; margin-bottom: 20px; font-size: 0.8em; flex-wrap: wrap; }
-#game-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; }
-#game-screen .controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 20px; }
-#hp-bar-container { width: 100px; height: 15px; border: 1px solid #fff; background-color: #555; display: inline-block; vertical-align: middle; margin-left: 5px;}
-#hp-bar { height: 100%; background-color: #ff4136; width: 100%; }
-.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); display: none; justify-content: center; align-items: center; z-index: 100; }
-.modal.visible { display: flex; }
-#confirm-modal { z-index: 101; }
-.modal-content { background-color: #1a1a1a; padding: 20px; border: 4px solid #ff8c00; border-radius: 10px; width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto; color: #FFFFFF; }
-table { width: 100%; border-collapse: collapse; font-size: 0.7em; }
-th, td { border: 1px solid #fff; padding: 8px; text-align: center; }
-th { background-color: #555; }
-#pagination { margin-top: 15px; }
-.item-list { list-style: none; padding: 0; }
-.item-list li { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #444; }
-.item-list li:last-child { border-bottom: none; }
-.item-info { text-align: left; flex-grow: 1; margin-right: 10px;}
-.item-info p { margin: 0; font-size: 0.8em; }
-.item-info small { color: #aaa; }
-.balance-display { font-size: 1.2em; color: #00ff00; margin-bottom: 20px; }
-.wallet-section small { font-size: 0.6em; color: #aaa; display: block; margin-top: 5px;}
-.deposit-notes { font-size: 0.6em; text-align: left; line-height: 1.5; border: 1px dashed #888; padding: 10px; margin-top: 15px;}
-.deposit-notes strong { color: #f8b800; }
-.deposit-notes a { color: #00ffff; }
-#deposit-qr-code { width: 150px; height: 150px; margin: 10px auto; display: block; background: white; padding: 15px; border-radius: 8px; }
-.swap-box { background-color: #333; border: 2px solid #888; border-radius: 8px; padding: 15px; margin-bottom: 10px; }
-.swap-box-header { display: flex; justify-content: space-between; font-size: 0.7em; margin-bottom: 10px; color: #aaa; }
-.swap-box-main { display: flex; justify-content: space-between; align-items: center; }
-.swap-box-main input { width: 60%; margin: 0; text-align: left; font-size: 1.2em; background: transparent; border: none; }
-.swap-box-main .currency-name { font-size: 0.9em; color: #f8b800; }
-#swap-flipper { font-size: 1.5em; padding: 5px 10px; margin: 5px 0; }
-#notification-container { position: fixed; top: 20px; right: 20px; z-index: 1000; display: flex; flex-direction: column; gap: 10px; }
-.toast-notification { font-family: 'Press Start 2P', cursive; background-color: #333; color: #fff; padding: 15px; border: 2px solid #fff; border-radius: 5px; box-shadow: 0 0 10px #000; opacity: 0; transform: translateX(100%); transition: all 0.5s ease-in-out; font-size: 0.8em; }
-.toast-notification.show { opacity: 1; transform: translateX(0); }
-.toast-notification.success { border-color: #00ff00; }
-.toast-notification.error { border-color: #ff4136; }
-.toast-notification.info { border-color: #00ffff; }
-.info-links { margin-top: 15px; font-size: 0.7em; }
-.info-links a { margin: 0 10px; }
+        /* General Styles */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #000; font-family: &#39;Press Start 2P&#39;, cursive; text-align: center; }
+        body.logged-out { display: flex; justify-content: center; align-items: center; }
+        .container { border: 4px solid #fff; padding: 20px; background-color: #1a1a1a; box-shadow: 0 0 20px #fff; border-radius: 10px; max-width: 90%; width: 500px; }
+        h1 { color: #f8b800; text-shadow: 2px 2px #e84800; }
+        h2 { text-shadow: 2px 2px #ff8c00; }
+        h3 { font-size: 0.9em; color: #f8b800; margin-top: 20px; margin-bottom: 10px; border-bottom: 1px dashed #fff; padding-bottom: 5px;}
+        button { font-family: &#39;Press Start 2P&#39;, cursive; background-color: #555; color: #fff; border: 2px solid #fff; padding: 10px 20px; cursor: pointer; text-transform: uppercase; margin: 5px; border-radius: 5px; transition: background-color 0.3s, box-shadow 0.3s; display: inline-flex; justify-content: center; align-items: center; white-space: nowrap; }
+        button:hover { background-color: #777; box-shadow: 0 0 10px #fff; }
+        button:disabled { background-color: #333; color: #888; cursor: not-allowed; box-shadow: none; border-color: #888; }
+        input, select { font-family: &#39;Press Start 2P&#39;, cursive; padding: 10px; border: 2px solid #fff; background-color: #333; color: #fff; text-align: center; border-radius: 5px; margin-bottom: 10px; width: calc(100% - 24px); }
+        a { color: #00ffff; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .hidden { display: none !important; }
+        #message, #code-message, #wallet-message { margin-top: 15px; color: #ffcc00; min-height: 20px; font-size: 0.8em; }
+        .login-container { border-color: #f8b800; box-shadow: 0 0 20px #f8b800; }
+        .login-container input { border-color: #f8b800; }
+        .login-container button { background-color: #e84800; border-color: #fff; }
+        .login-container button:hover { background-color: #c83800; box-shadow: 0 0 10px #fff;}
+        .login-container p { font-size: 0.7em; line-height: 1.5; }
+        .login-container small { font-size: 0.5em; color: #aaa; }
+        .recaptcha-container { text-align: center; margin: 15px 0; }
+        .g-recaptcha { display: inline-block; }
+        #game-screen .stats { display: flex; justify-content: space-around; margin-bottom: 20px; font-size: 0.8em; flex-wrap: wrap; }
+        #game-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; }
+        #game-screen .controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 20px; }
+        #hp-bar-container { width: 100px; height: 15px; border: 1px solid #fff; background-color: #555; display: inline-block; vertical-align: middle; margin-left: 5px;}
+        #hp-bar { height: 100%; background-color: #ff4136; width: 100%; }
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); display: none; justify-content: center; align-items: center; z-index: 100; }
+        .modal.visible { display: flex; }
+        #confirm-modal { z-index: 101; }
+        .modal-content { background-color: #1a1a1a; padding: 20px; border: 4px solid #ff8c00; border-radius: 10px; width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.7em; }
+        th, td { border: 1px solid #fff; padding: 8px; text-align: center; }
+        th { background-color: #555; }
+        #pagination { margin-top: 15px; }
+        .item-list { list-style: none; padding: 0; }
+        .item-list li { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #444; }
+        .item-list li:last-child { border-bottom: none; }
+        .item-info { text-align: left; flex-grow: 1; margin-right: 10px;}
+        .item-info p { margin: 0; font-size: 0.8em; }
+        .item-info small { color: #aaa; }
+        .balance-display { font-size: 1.2em; color: #00ff00; margin-bottom: 20px; }
+        .wallet-section small { font-size: 0.6em; color: #aaa; display: block; margin-top: 5px;}
+        .deposit-notes { font-size: 0.6em; text-align: left; line-height: 1.5; border: 1px dashed #888; padding: 10px; margin-top: 15px;}
+        .deposit-notes strong { color: #f8b800; }
+        .deposit-notes a { color: #00ffff; }
+        #deposit-qr-code { width: 150px; height: 150px; margin: 10px auto; display: block; background: white; padding: 15px; border-radius: 8px; }
+        .swap-box { background-color: #333; border: 2px solid #888; border-radius: 8px; padding: 15px; margin-bottom: 10px; }
+        .swap-box-header { display: flex; justify-content: space-between; font-size: 0.7em; margin-bottom: 10px; color: #aaa; }
+        .swap-box-main { display: flex; justify-content: space-between; align-items: center; }
+        .swap-box-main input { width: 60%; margin: 0; text-align: left; font-size: 1.2em; background: transparent; border: none; }
+        .swap-box-main .currency-name { font-size: 0.9em; color: #f8b800; }
+        #swap-flipper { font-size: 1.5em; padding: 5px 10px; margin: 5px 0; }
+        #notification-container { position: fixed; top: 20px; right: 20px; z-index: 1000; display: flex; flex-direction: column; gap: 10px; }
+        .toast-notification { font-family: &#39;Press Start 2P&#39;, cursive; background-color: #333; color: #fff; padding: 15px; border: 2px solid #fff; border-radius: 5px; box-shadow: 0 0 10px #000; opacity: 0; transform: translateX(100%); transition: all 0.5s ease-in-out; font-size: 0.8em; }
+        .toast-notification.show { opacity: 1; transform: translateX(0); }
+        .toast-notification.success { border-color: #00ff00; }
+        .toast-notification.error { border-color: #ff4136; }
+        .toast-notification.info { border-color: #00ffff; }
+        .info-links { margin-top: 15px; font-size: 0.7em; }
+        .info-links a { margin: 0 10px; }
 
-/* Game Styles */
-#game-container{ position:relative; border:4px solid #555; box-shadow:0 0 20px #00000080; display: flex; flex-direction: column; width: 100%; height: 100%; max-width: 960px; max-height: 720px; }
-body.mobile #game-container { max-width: none; max-height: none; }
-canvas{ display:block; background-color:#000; width: 100%; height: 100%; }
-#orientation-blocker { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #000; color: #fff; z-index: 9999; display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; font-size: 1.2em; }
-#orientation-blocker svg { width: 64px; height: 64px; margin-bottom: 20px; animation: rotate 1.5s linear infinite alternate; }
-@keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(90deg); } }
-@media (orientation: portrait) { #orientation-blocker { display: flex; } }
-#main-layout { display: none; width: 100vw; height: 100vh; align-items: center; justify-content: center; }
-#main-layout.visible { display: flex; }
-#game-canvas-container { display: flex; justify-content: center; align-items: center; flex-grow: 1; height: 100%; padding: 10px; }
-.touch-controls { display: none; height: 100%; flex-direction: column; justify-content: center; align-items: center; user-select: none; flex-shrink: 0; width: 130px; margin: 0 15px; }
-body.mobile .touch-controls { display: flex; }
-#left-controls { position: relative; left: 15px; transform: translateY(70px); }
-#dpad-container { position: relative; width: 130px; height: 130px; }
-.dpad-button { position: absolute; background-color: #fff; cursor: pointer; transition: background-color 0.1s ease; border-radius: 8px; }
-.dpad-button:active { background-color: #ccc; }
-.dpad-button.up, .dpad-button.down { width: 44px; height: 88px; left: 43px; }
-.dpad-button.up { top: 0; }
-.dpad-button.down { bottom: 0; }
-.dpad-button.left, .dpad-button.right { width: 88px; height: 44px; top: 43px; }
-.dpad-button.left { left: 0; }
-.dpad-button.right { right: 0; }
-#right-controls { justify-content: center; gap: 40px; transform: translateY(70px); }
-.action-buttons { display: flex; align-items: center; gap: 15px; }
-.round-button { width: 60px; height: 60px; border-radius: 50%; background-color: #fff; display: flex; justify-content: center; align-items: center; color: #000; font-size: 24px; font-weight: bold; cursor: pointer; transition: background-color 0.1s ease; }
-.round-button:active { background-color: #ccc; }
-#button-start-touch { width: 90px; height: 30px; background-color: #fff; color: #000; border-radius: 20px; display: flex; justify-content: center; align-items: center; font-size: 12px; letter-spacing: 1px; cursor: pointer; transition: background-color 0.1s ease; }
-#button-start-touch:active { background-color: #ccc; }
+        /* Game Styles */
+        #game-container{ position:relative; border:4px solid #555; box-shadow:0 0 20px #00000080; display: flex; flex-direction: column; width: 100%; height: 100%; max-width: 960px; max-height: 720px; }
+        body.mobile #game-container { max-width: none; max-height: none; }
+        canvas{ display:block; background-color:#000; width: 100%; height: 100%; }
+        #orientation-blocker { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #000; color: #fff; z-index: 9999; display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; font-size: 1.2em; }
+        #orientation-blocker svg { width: 64px; height: 64px; margin-bottom: 20px; animation: rotate 1.5s linear infinite alternate; }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(90deg); } }
+        @media (orientation: portrait) { #orientation-blocker { display: flex; } }
+        #main-layout { display: none; width: 100vw; height: 100vh; align-items: center; justify-content: center; }
+        #main-layout.visible { display: flex; }
+        #game-canvas-container { display: flex; justify-content: center; align-items: center; flex-grow: 1; height: 100%; padding: 10px; }
+        .touch-controls { display: none; height: 100%; flex-direction: column; justify-content: center; align-items: center; user-select: none; flex-shrink: 0; width: 130px; margin: 0 15px; }
+        body.mobile .touch-controls { display: flex; }
+        #left-controls { position: relative; left: 15px; transform: translateY(70px); }
+        #dpad-container { position: relative; width: 130px; height: 130px; }
+        .dpad-button { position: absolute; background-color: #fff; cursor: pointer; transition: background-color 0.1s ease; border-radius: 8px; }
+        .dpad-button:active { background-color: #ccc; }
+        .dpad-button.up, .dpad-button.down { width: 44px; height: 88px; left: 43px; }
+        .dpad-button.up { top: 0; }
+        .dpad-button.down { bottom: 0; }
+        .dpad-button.left, .dpad-button.right { width: 88px; height: 44px; top: 43px; }
+        .dpad-button.left { left: 0; }
+        .dpad-button.right { right: 0; }
+        #right-controls { justify-content: center; gap: 40px; transform: translateY(70px); }
+        .action-buttons { display: flex; align-items: center; gap: 15px; }
+        .round-button { width: 60px; height: 60px; border-radius: 50%; background-color: #fff; display: flex; justify-content: center; align-items: center; color: #000; font-size: 24px; font-weight: bold; cursor: pointer; transition: background-color 0.1s ease; }
+        .round-button:active { background-color: #ccc; }
+        #button-start-touch { width: 90px; height: 30px; background-color: #fff; color: #000; border-radius: 20px; display: flex; justify-content: center; align-items: center; font-size: 12px; letter-spacing: 1px; cursor: pointer; transition: background-color 0.1s ease; }
+        #button-start-touch:active { background-color: #ccc; }
