@@ -76,7 +76,7 @@ try {
     
     // --- GAME LOGIC (Se inicializa después del login) ---
     let canvas, ctx, players, enemies, platforms, particles, explosiveBlock, keys;
-    let level, highScore, musicStarted, playerSelectOption;
+    let level, highScore, musicStarted, playerSelectOption, levelTransitionTimer;
 
     const GAME_WIDTH = 960, GAME_HEIGHT = 720, GRAVITY = 0.6, PLAYER_SPEED = 5;
     const PLAYER_JUMP = -10, JUMP_HOLD_GRAVITY = GRAVITY * 0.5, ENEMY_SPEED = 1.0;
@@ -106,7 +106,7 @@ try {
         platforms = [];
         particles = [];
         level = 1;
-        playerSelectOption = 1; // Default to 1 player for desktop
+        playerSelectOption = 1; 
         highScore = parseInt(localStorage.getItem(HIGH_SCORE_KEY) || '0');
         
         const isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
@@ -135,6 +135,8 @@ try {
     }
     
     function resizeGame() {
+        canvas.width = GAME_WIDTH;
+        canvas.height = GAME_HEIGHT;
         const container = document.getElementById('game-canvas-container');
         if (!container) return;
         
@@ -205,8 +207,7 @@ try {
         players.push(new Player(1, p1Controls, '🤖', playerData));
         if (numPlayers === 2) { 
             const p2Controls = { left: 'arrowleft', right: 'arrowright', jump: 'arrowup' }; 
-            // Para el P2, podríamos usar datos por defecto o cargarlos si el API lo permite
-            const p2Data = { Username: "Player 2", HP_Max: 1000, Attack: 1, Defense: 1 };
+            const p2Data = { Username: "Player 2", HP_Max: 1000, Attack: 1, Defense: 1, score: 0 };
             players.push(new Player(2, p2Controls, '🧑‍🚀', p2Data)); 
         }
         explosiveBlock = new ExplosiveBlock(); 
@@ -225,7 +226,7 @@ try {
         platforms.forEach(p => { p.isFrozen = false; });
         players.forEach(p => { if (!p.isDead) { p.resetPosition(); } });
         enemies = []; 
-        explosiveBlock.reset();
+        if (explosiveBlock) explosiveBlock.reset();
         const finalLevel = Math.min(levelNum, 50); 
         const enemyCount = 2 + Math.floor(finalLevel / 2);
         for (let i = 0; i < enemyCount; i++) {
@@ -242,10 +243,10 @@ try {
 
     function update() {
         if (gameState === 'playing') {
-            players.forEach(p => p.update()); 
-            enemies.forEach(e => e.update()); 
+            players.forEach(p => p.update(keys, particles, Particle)); 
+            enemies.forEach(e => e.update(platforms, particles, Particle, enemies)); 
             platforms.forEach(p => p.update()); 
-            explosiveBlock.update(); 
+            if (explosiveBlock) explosiveBlock.update(); 
             handleCollisions();
             if (enemies.length === 0 && players.some(p => !p.isDead)) { 
                 level++; 
@@ -267,29 +268,36 @@ try {
         players.forEach(player => {
             if (player.isDead) return;
             const block = explosiveBlock; 
-            if (block.usesLeft > 0 && player.x < block.x + block.width && player.x + player.width > block.x && player.y + player.height >= block.y && player.y + player.height <= block.y + 10 + player.vy && player.vy >= 0) { player.y = block.y - player.height; player.vy = 0; player.onGround = true; }
-            let onAnyPlatform = player.onGround; 
+            if (block && block.usesLeft > 0 && player.x < block.x + block.width && player.x + player.width > block.x && player.y + player.height >= block.y && player.y + player.height <= block.y + 10 + player.vy && player.vy >= 0) { player.y = block.y - player.height; player.vy = 0; player.onGround = true; }
+            let onAnyPlatform = false; 
             let isCurrentlyOnFrozenPlatform = false;
             platforms.forEach(p => {
-                if (player.x < p.x + p.width && player.x + player.width > p.x && player.y + player.height >= p.y && player.y + player.height <= p.y + p.height + player.vy && player.vy >= 0) { player.y = p.y - player.height; player.vy = 0; player.onGround = true; onAnyPlatform = true; if (p.isFrozen) isCurrentlyOnFrozenPlatform = true; player.x += p.vx; }
-                if (player.x < p.x + p.width && player.x + player.width > p.x && player.y > p.y && player.y <= p.y + p.height && player.vy < 0) { player.y = p.y + p.height; player.vy = 0; const hitCenterX = player.x + player.width / 2; enemies.forEach(enemy => { const onThisPlatform = Math.abs((enemy.y + enemy.height) - p.y) < 10; const withinHitRange = enemy.x < hitCenterX + 20 && (enemy.x + enemy.width) > hitCenterX - 20; if (!enemy.isFlipped && onThisPlatform && withinHitRange) { enemy.flip(); player.addScore(50); } }); }
+                if (player.x < p.x + p.width && player.x + player.width > p.x && player.y + player.height >= p.y && player.y + player.height <= p.y + p.height + (player.vy > 0 ? player.vy : 2) && player.vy >= 0) { player.y = p.y - player.height; player.vy = 0; onAnyPlatform = true; if (p.isFrozen) isCurrentlyOnFrozenPlatform = true; player.x += p.vx; }
+                if (player.x < p.x + p.width && player.x + player.width > p.x && player.y > p.y && player.y <= p.y + p.height && player.vy < 0) { player.y = p.y + p.height; player.vy = 0; const hitCenterX = player.x + player.width / 2; enemies.forEach(enemy => { const onThisPlatform = Math.abs((enemy.y + enemy.height) - p.y) < 10; const withinHitRange = enemy.x < hitCenterX + 20 && (enemy.x + enemy.width) > hitCenterX - 20; if (!enemy.isFlipped && onThisPlatform && withinHitRange) { enemy.flip(); player.addScore(50, updateHighScore); } }); }
             });
             player.onGround = onAnyPlatform; 
             player.onFrozenPlatform = isCurrentlyOnFrozenPlatform;
-            if (player.x < block.x + block.width && player.x + player.width > block.x && player.y > block.y && player.y <= block.y + block.height && player.vy < 0) { player.y = block.y + block.height; player.vy = 0; block.hit(); }
+            if (block && player.x < block.x + block.width && player.x + player.width > block.x && player.y > block.y && player.y <= block.y + block.height && player.vy < 0) { player.y = block.y + block.height; player.vy = 0; block.hit(); }
             enemies.forEach((enemy, index) => { 
                 if (player.x < enemy.x + enemy.width && player.x + player.width > enemy.x && player.y < enemy.y + enemy.height && player.y + player.height > enemy.y) { 
                     if (enemy.isFlipped) { 
                         enemies.splice(index, 1); 
                         for (let i = 0; i < 20; i++) particles.push(new Particle(enemy.x, enemy.y, enemy.sprite)); 
-                        player.addScore(200); 
+                        player.addScore(200, updateHighScore); 
                     } else { 
-                        player.die(enemy.damage); 
+                        player.die(enemy.damage, particles, Particle, checkGameOver, soundLoseLife); 
                     } 
                 } 
             });
         });
         for (let i = 0; i < enemies.length; i++) { for (let j = i + 1; j < enemies.length; j++) { const e1 = enemies[i]; const e2 = enemies[j]; if (e1.x < e2.x + e2.width && e1.x + e1.width > e2.x && e1.y < e2.y + e2.height && e1.y + e1.height > e2.y) { if (!e1.isFlipped && !e2.isFlipped && e1.onGround && e2.onGround) { const tempVx = e1.vx; e1.vx = e2.vx; e2.vx = tempVx; if (e1.x < e2.x) { e1.x -= 1; e2.x += 1; } else { e1.x += 1; e2.x -= 1; } } } } }
+    }
+    
+    function updateHighScore(score) {
+        if (score > highScore) {
+            highScore = score;
+            localStorage.setItem(HIGH_SCORE_KEY, highScore.toString());
+        }
     }
 
     function draw() {
@@ -298,21 +306,20 @@ try {
         if (gameState === 'playerSelect') { 
             drawPlayerSelect(); 
         } else if (gameState === 'playing' || gameState === 'paused' || gameState === 'levelTransition' || gameState === 'gameOver') {
-            platforms.forEach(p => p.draw()); 
-            explosiveBlock.draw(); 
-            enemies.forEach(e => e.draw()); 
-            players.forEach(p => p.draw());
+            platforms.forEach(p => p.draw(ctx)); 
+            if (explosiveBlock) explosiveBlock.draw(); 
+            enemies.forEach(e => e.draw(ctx)); 
+            players.forEach(p => p.draw(ctx));
             drawUI();
             if (gameState === 'paused') { ctx.fillStyle = 'rgba(0, 0, 0, 0.5)'; ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT); ctx.fillStyle = 'white'; ctx.font = '50px "Press Start 2P"'; ctx.textAlign = 'center'; ctx.fillText('PAUSED', GAME_WIDTH / 2, GAME_HEIGHT / 2); }
             else if (gameState === 'levelTransition') { ctx.fillStyle = 'rgba(0, 0, 0, 0.5)'; ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT); ctx.fillStyle = 'white'; ctx.font = '50px "Press Start 2P"'; ctx.textAlign = 'center'; ctx.fillText(`LEVEL ${level}`, GAME_WIDTH / 2, GAME_HEIGHT / 2); }
             else if (gameState === 'gameOver') { drawGameOver(); }
         }
-        particles.forEach(p => p.draw());
+        particles.forEach(p => p.draw(ctx));
     }
 
     function drawUI() {
         ctx.font = '20px "Press Start 2P", sans-serif';
-        // --- P1 UI ---
         if (players[0]) {
             const p1 = players[0];
             ctx.textAlign = 'left';
@@ -331,8 +338,6 @@ try {
             ctx.strokeStyle = '#fff';
             ctx.strokeRect(85, 80, barWidth, 20);
         }
-
-        // --- DraicorCoins ---
         ctx.textAlign = 'center';
         ctx.fillStyle = '#ff4136';
         ctx.fillText('DraicorCoins', GAME_WIDTH / 2, 30);
@@ -341,7 +346,6 @@ try {
         const formattedScore = '🪙 ' + totalScore.toLocaleString('en-US');
         ctx.fillText(formattedScore, GAME_WIDTH / 2, 60);
 
-        // --- P2 UI ---
         if (players.length > 1 && players[1]) {
             const p2 = players[1];
             ctx.textAlign = 'right';
@@ -369,12 +373,10 @@ try {
         if (isMobile) {
             ctx.fillStyle = 'white'; ctx.font = '30px "Press Start 2P"';
             ctx.fillText('PRESS START TO PLAY', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 50);
-            // ... (resto de las instrucciones para móvil)
         } else {
             ctx.fillStyle = 'white'; ctx.font = '40px "Press Start 2P"'; ctx.fillText('SELECT PLAYERS', GAME_WIDTH / 2, GAME_HEIGHT / 2 - 50);
             ctx.font = '30px "Press Start 2P"'; ctx.fillStyle = playerSelectOption === 1 ? '#ffdc00' : 'white'; ctx.fillText('1 PLAYER', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 30);
             ctx.fillStyle = playerSelectOption === 2 ? '#ffdc00' : 'white'; ctx.fillText('2 PLAYERS', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 90);
-            // ... (resto de las instrucciones para escritorio)
         }
     }
 
@@ -393,6 +395,7 @@ try {
     }
     
     function handleStartPress() {
+        const isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
         if (gameState === 'playing') { 
             gameState = 'paused'; 
             playSound(soundPause);
@@ -404,7 +407,6 @@ try {
             if(bgMusic) bgMusic.play();
         }
         else if (gameState === 'playerSelect') { 
-            const isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
             const playersToStart = isMobile ? 1 : playerSelectOption;
             startGame(playersToStart);
         }
@@ -443,11 +445,7 @@ try {
         const startButtonTouch = document.getElementById('button-start-touch');
 
         if (dpadLeft && dpadRight && buttonA && startButtonTouch) {
-            const vibrate = (duration) => {
-                if (window.navigator.vibrate) {
-                    window.navigator.vibrate(duration);
-                }
-            };
+            const vibrate = (duration) => { if (window.navigator.vibrate) { window.navigator.vibrate(duration); } };
             dpadLeft.addEventListener('touchstart', (e) => { e.preventDefault(); vibrate(30); keys['a'] = true; });
             dpadLeft.addEventListener('touchend', (e) => { e.preventDefault(); keys['a'] = false; });
             dpadRight.addEventListener('touchstart', (e) => { e.preventDefault(); vibrate(30); keys['d'] = true; });
