@@ -13,21 +13,37 @@ export class Player {
         this.onGround = false;
         this.onFrozenPlatform = false;
         this.isDead = false;
+        
+        // Estos valores se inicializarán con datos del servidor
         this.score = 0;
-        this.hp = 1000;
-        this.maxHp = 1000;
+        this.draicorCoins = 0;
+        this.hp = 100;
+        this.maxHp = 100;
+        this.attack = 1;
+        this.defense = 1;
+        this.username = "Player";
 
-        // Position is set in resetPosition
         this.x = 0;
         this.y = 0;
     }
 
+    // ¡NUEVO! Método para poblar al jugador con datos del backend
+    initializeWithData(playerData) {
+        this.score = playerData.GameplayScore || 0;
+        this.draicorCoins = playerData.DraicorCoins || 0;
+        this.maxHp = playerData.HP_Max || 100;
+        this.hp = this.maxHp; // Empieza con la vida al máximo
+        this.attack = playerData.Attack || 1;
+        this.defense = playerData.Defense || 1;
+        this.username = playerData.Username || "Player";
+    }
+
     resetPosition(GAME_WIDTH, GAME_HEIGHT) {
-        this.x = GAME_WIDTH / 2 - this.width / 2 + (this.id === 1 ? -50 : 50);
+        this.x = GAME_WIDTH / 2 - this.width / 2;
         this.y = GAME_HEIGHT - this.height - 50;
         this.vx = 0;
         this.vy = 0;
-        if(this.hp <= 0) {
+        if (this.hp <= 0) {
             this.hp = this.maxHp;
             this.isDead = false;
         }
@@ -87,7 +103,9 @@ export class Player {
     die(damageAmount, particles, checkGameOver, playSound, soundLoseLife) {
         if (this.isDead) return;
 
-        this.hp -= damageAmount;
+        // Simple cálculo de daño con defensa
+        const damageTaken = Math.max(1, damageAmount - this.defense);
+        this.hp -= damageTaken;
         playSound(soundLoseLife);
 
         if (this.hp <= 0) {
@@ -100,14 +118,9 @@ export class Player {
         }
     }
 
-    addScore(points, HIGH_SCORE_KEY) {
+    addScore(points) {
         this.score += points;
-        
-        // This logic needs to be handled in main.js where highScore is a state
-        // if (this.score > highScore) {
-        //     highScore = this.score;
-        //     localStorage.setItem(HIGH_SCORE_KEY, highScore.toString());
-        // }
+        // La puntuación ahora se guarda en el servidor al final del juego
     }
 }
 
