@@ -1,4 +1,4 @@
-{
+* {
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
 }
@@ -22,14 +22,22 @@ canvas{
     display:block; background-color:#000;
     width: 100%; height: 100%;
 }
-#message-overlay{position:absolute;top:0;left:0;width:100%;height:100%;background-color:#000000b3;color:#fff;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;z-index:10}
-#message-overlay.hidden{display:none !important;}
+
+/* --- CAMBIO IMPORTANTE --- */
+/* El overlay ahora está oculto por defecto con "display: none" */
+#message-overlay{
+    position:absolute;top:0;left:0;width:100%;height:100%;
+    background-color:#000000b3;color:#fff;
+    display: none; /* Oculto por defecto */
+    flex-direction:column;justify-content:center;align-items:center;
+    text-align:center;z-index:10;
+}
+
 #message-title{font-size:3em;margin-bottom:.5em;color:#ffdc00;text-shadow:3px 3px 0 #ff4136}
 #message-text{font-size:1.2em;margin-bottom:1.5em;max-width:80%;line-height:1.5}
 #start-button{padding:15px 30px;font-family:"Press Start 2P",cursive;font-size:1.2em;color:#fff;background-color:#0074d9;border:3px solid #fff;border-radius:8px;cursor:pointer;text-transform:uppercase;transition:all .2s ease}
 #start-button:hover{background-color:#7fdbff;color:#000;transform:translateY(-3px);box-shadow:0 5px #fff}
 #start-button:active{transform:translateY(0);box-shadow:none}
-.hidden{visibility:hidden}
 
 #orientation-blocker {
     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
